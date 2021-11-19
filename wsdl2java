@@ -1,6 +1,6 @@
 #!/bin/bash
 
-AXIS_HOME=/home/sergey/axis-1_4
+AXIS_HOME=$(cd -P ~/;pwd)/axis-1_4
 
 install_axis(){
 tmp=$(mktemp)
