@@ -1,0 +1,32 @@
+#!/bin/bash
+
+AXIS_HOME=/home/sergey/axis-1_4
+
+install_axis(){
+tmp=$(mktemp)
+rm -f $tmp
+mkdir -p $tmp
+curl https://dlcdn.apache.org/axis/axis/java/1.4/axis-bin-1_4.tar.gz 2>/dev/null|
+tar -xvz -C $tmp >/dev/null && mv $tmp/axis-1_4/ $AXIS_HOME
+chmod +x $0
+test -d ~/bin && cp $0 ~/bin/wsdl2java
+test -d ~/bin || test -d ~/.local/bin && cp $0 ~/.local/bin/wsdl2java
+
+rm -rf $tmp
+}
+
+test -d ${AXIS_HOME} || install_axis
+
+AXIS_CLASSPATH=
+
+while read -r line
+do
+[ -n "${AXIS_CLASSPATH}" ] && AXIS_CLASSPATH="${AXIS_CLASSPATH}:"
+AXIS_CLASSPATH=${AXIS_CLASSPATH}${line}
+done <<< $(find ${AXIS_HOME}/lib -maxdepth 1 -name "*.jar")
+
+#echo ${AXIS_CLASSPATH}
+java -cp ${AXIS_CLASSPATH} \
+-Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true \
+org.apache.axis.wsdl.WSDL2Java $*
+
